@@ -1,0 +1,223 @@
+A continuación, te proporcionaré un paso a paso completo para crear un proyecto Java utilizando Spring Boot, incluyendo tanto el frontend como el backend, y las dependencias necesarias para implementar Google reCAPTCHA.
+
+### Paso 1: Crear el Proyecto Java con Spring Boot
+
+#### 1. Usar Spring Initializr
+
+La forma más sencilla de crear un proyecto Spring Boot es utilizando **Spring Initializr**. Aquí están los pasos:
+
+1. **Accede a Spring Initializr**: Ve a [Spring Initializr](https://start.spring.io/).
+
+2. **Configura el Proyecto**:
+   - **Project**: Selecciona **Maven Project**.
+   - **Language**: Selecciona **Java**.
+   - **Spring Boot**: Elige la versión más reciente (por ejemplo, `2.7.4` o superior).
+   - **Project Metadata**:
+     - **Group**: `com.example`
+     - **Artifact**: `recaptcha-demo`
+     - **Name**: `recaptcha-demo`
+     - **Description**: `Demo project for Spring Boot with reCAPTCHA`
+     - **Package name**: `com.example.recaptchademo`
+     - **Packaging**: `Jar`
+     - **Java Version**: Elige la versión de Java que estés utilizando (por ejemplo, `11` o `17`).
+
+3. **Selecciona las Dependencias**:
+   - Haz clic en "Add Dependencies" y selecciona las siguientes:
+     - **Spring Web**
+     - **Spring Boot DevTools** (opcional, para desarrollo más fácil)
+     - **Spring Boot Starter Test** (opcional, para pruebas)
+
+4. **Generar el Proyecto**:
+   - Haz clic en el botón "Generate" para descargar un archivo `.zip` que contiene tu nuevo proyecto.
+
+5. **Descomprimir y Abrir el Proyecto**:
+   - Descomprime el archivo descargado y abre la carpeta del proyecto en tu IDE favorito (Eclipse, IntelliJ IDEA, etc.).
+
+### Paso 2: Estructura del Proyecto
+
+Una vez que abras el proyecto en tu IDE, deberías ver una estructura similar a esta:
+
+```
+recaptcha-demo
+│
+├── src
+│   ├── main
+│   │   ├── java
+│   │   │   └── com
+│   │   │       └── example
+│   │   │           └── recaptchademo
+│   │   │               ├── RecaptchaDemoApplication.java
+│   │   │               ├── CaptchaRequest.java
+│   │   │               ├── RecaptchaResponse.java
+│   │   │               └── VerificationController.java
+│   │   └── resources
+│   │       ├── application.properties
+│   └── test
+└── pom.xml
+```
+
+### Paso 3: Crear Clases Necesarias
+
+#### 1. Clase Principal
+
+La clase principal se genera automáticamente cuando creas el proyecto:
+
+```java
+package com.example.recaptchademo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class RecaptchaDemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(RecaptchaDemoApplication.class, args);
+    }
+}
+```
+
+#### 2. Clases de Solicitud y Respuesta
+
+Crea las clases `CaptchaRequest` y `RecaptchaResponse`.
+
+**CaptchaRequest.java**
+
+```java
+package com.example.recaptchademo;
+
+public class CaptchaRequest {
+    private String gRecaptchaResponse;
+
+    public String getGRecaptchaResponse() {
+        return gRecaptchaResponse;
+    }
+
+    public void setGRecaptchaResponse(String gRecaptchaResponse) {
+        this.gRecaptchaResponse = gRecaptchaResponse;
+    }
+}
+```
+
+**RecaptchaResponse.java**
+
+```java
+package com.example.recaptchademo;
+
+public class RecaptchaResponse {
+    private boolean success;
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    // Puedes agregar más campos según sea necesario (score, challenge_ts, hostname...)
+}
+```
+
+#### 3. Controlador para Verificación
+
+Crea la clase `VerificationController`.
+
+**VerificationController.java**
+
+```java
+package com.example.recaptchademo;
+
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.ResponseEntity;
+
+@RestController
+@RequestMapping("/api")
+public class VerificationController {
+
+    private static final String RECAPTCHA_SECRET_KEY = "YOUR_SECRET_KEY"; // Reemplaza con tu clave secreta real
+
+    @PostMapping("/verify")
+    public ResponseEntity<String> verifyCaptcha(@RequestBody CaptchaRequest request) {
+        String recaptchaResponse = request.getGRecaptchaResponse(); // Obtener el token
+
+        // Validar reCAPTCHA
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "https://www.google.com/recaptcha/api/siteverify?secret=" + RECAPTCHA_SECRET_KEY + "&response=" + recaptchaResponse;
+
+        ResponseEntity<RecaptchaResponse> response = restTemplate.postForEntity(url, null, RecaptchaResponse.class);
+
+        if (response.getBody() != null && response.getBody().isSuccess()) {
+            return ResponseEntity.ok("{\"success\": true}");
+        } else {
+            return ResponseEntity.ok("{\"success\": false}");
+        }
+    }
+}
+```
+
+### Paso 4: Configuración de Aplicación
+
+#### 1. Archivo `application.properties`
+
+En `src/main/resources/application.properties`, puedes agregar configuraciones adicionales si es necesario. Por ahora, no es necesario modificar nada para esta implementación básica.
+
+### Paso 5: Ejecutar la Aplicación
+
+1. **Ejecutar la Aplicación desde tu IDE**:
+   - Si estás usando IntelliJ IDEA o Eclipse, puedes ejecutar la aplicación directamente desde la interfaz del IDE.
+  
+2. **Ejecutar desde la Línea de Comandos**:
+   - Navega a la carpeta del proyecto y ejecuta el siguiente comando:
+
+```bash
+./mvnw spring-boot:run  # Para sistemas Unix/Linux/MacOS
+mvnw spring-boot:run     # Para Windows (puedes usar mvnw.cmd)
+```
+
+### Paso 6: Probar la Aplicación
+
+1. Abre tu navegador y carga el archivo HTML que creaste anteriormente (`index.html`).
+2. Completa el reCAPTCHA y verifica que se envíe correctamente al servidor.
+3. Observa los mensajes de éxito o error según la validación del token.
+
+### Dependencias Necesarias
+
+Aquí tienes un resumen de las dependencias que debes incluir en tu archivo `pom.xml`:
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter</artifactId>
+    </dependency>
+</dependencies>
+```
+
+### Resumen Completo
+
+- Has creado un proyecto Spring Boot utilizando Spring Initializr.
+- Has configurado un frontend simple con Google reCAPTCHA.
+- Has implementado un backend en Java que valida el token de reCAPTCHA con la API de Google.
+- Has probado la aplicación para asegurarte de que todo funcione correctamente.
+
+Este flujo proporciona una base sólida para proteger tu aplicación contra bots utilizando Google reCAPTCHA. Si tienes más preguntas o necesitas ayuda adicional, no dudes en preguntar.
+
+Citations:
+[1] https://www.ionos.com/es-us/digitalguide/paginas-web/desarrollo-web/spring-boot-tutorial/
+[2] https://certidevs.com/tutorial-spring-boot-inyeccion-de-dependencias
+[3] https://tenocode.com/recaptcha-v3-con-angular/
+[4] https://gustavopeiretti.com/crear-proyecto-spring-boot-initilizr/
+[5] https://www.ibm.com/mx-es/topics/java-spring-boot
+[6] https://adictosaltrabajo.com/2010/04/26/jcaptcha/
+[7] https://rosamarfil.es/tutoriales/programacion/spring-boot-api-rest-2-crear-una-aplicacion-web-con-spring-boot/
+[8] https://www.humanas.unal.edu.co/2017/unidades-academicas/departamentos/antropologia/application/files/1616/2741/6732/4a.c._Spring_Boot_Parte_2_1.pdf
+[9] https://jonasurbano.wordpress.com/2014/07/29/integrando-un-captcha-en-un-proyecto-java-con-spring/
+[10] https://www.arteco-consulting.com/articulos/tutorial-springboot/
+[11] https://www.ibm.com/es-es/topics/java-spring-boot
+[12] https://www.tutorialesprogramacionya.com/springbootya/detalleconcepto.php?codigo=3&inicio=0&punto=2
+[13] https://www.youtube.com/watch?v=YbvZe1wDQqQ

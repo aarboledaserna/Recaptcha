@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validación de reCAPTCHA</title>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>Formulario de Contacto</h1>
+    
+    <div class="g-recaptcha" data-sitekey="6LeuxVYqAAAAAKEnAv4YyrudFlmPAGh14kDQi_TP" data-callback="onSubmit"></div>
+
+    <script>
+
+        function onSubmit(token) {
+            
+            console.log ('Hola')
+            console.log (token)
+       
+            fetch('http://localhost:8080/api/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 'g-recaptcha-response': token }) // Usando g-recaptcha-response
+            })
+
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+
+            .then(data => {
+                if (data.success) {
+                    alert('Validación exitosa. Token enviado al servidor.');
+                } else {
+                    alert('Error en la validación del reCAPTCHA.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ocurrió un error al enviar el token.');
+            });
+        }
+    </script>
+</body>
+</html>

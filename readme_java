@@ -1,0 +1,38 @@
+package com.example.Recaptcha_demo_back;
+
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.ResponseEntity;
+
+@RestController
+@RequestMapping("/api")
+public class VerificationController {
+    private static final String RECAPTCHA_SECRET_KEY = "6LeuxVYqAAAAAEyTNV-JBaJ0GtCFZtrwZtz5Y9wR";
+
+    @CrossOrigin(origins = "http://127.0.0.1:5501")
+    @PostMapping("/verify")
+    public ResponseEntity<String> verifyCaptcha(@RequestBody CaptchaRequest request) {
+        String recaptchaResponse = request.getGRecaptchaResponse();
+
+        // Crear una instancia de RestTemplate
+        RestTemplate restTemplate = new RestTemplate();
+
+        // URL con los parámetros en el formato correcto
+        String url = "https://www.google.com/recaptcha/api/siteverify?secret="
+                + RECAPTCHA_SECRET_KEY + "&response=" + recaptchaResponse;
+
+        ResponseEntity<RecaptchaResponse> response;
+        try {
+            response = restTemplate.postForEntity(url, null, RecaptchaResponse.class);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"success\": false, \"error\": \"Error DE validación  reCAPTCHA.\"}");
+        }
+
+        // Comprobar el éxito de la respuesta de Google
+        if (response.getBody() != null && response.getBody().isSuccess()) {
+            return ResponseEntity.ok("{\"success\": true}");
+        } else {
+            return ResponseEntity.ok("{\"success\": false}");
+        }
+    }
+}

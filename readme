@@ -1,0 +1,10 @@
+Index.html es la pareja de server.js
+
+Debo ejecutar el server desde consola con :  node.server.js
+
+luego debo abrir el html desde el pto 3500.
+
+
+
+RecaptchaAutomaticToken  es un front mas completo que cuando se completa automaticamente se procede o emparejar con una api hecha 
+en cualquier back.
