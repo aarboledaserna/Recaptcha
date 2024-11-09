@@ -16,7 +16,7 @@ app.get('/', (req, res) => {
 
 // Ruta para manejar la verificación del reCAPTCHA
 app.post('/verify', async (req, res) => {
-    const secretKey = '6LeuxVYqAAAAAEyTNV-JBaJ0GtCFZtrwZtz5Y9wR'; // Reemplaza con tu clave secreta
+    const secretKey = ''; // Reemplaza con tu clave secreta
     const responseKey = req.body['g-recaptcha-response'];
     const userIP = req.ip;
 
