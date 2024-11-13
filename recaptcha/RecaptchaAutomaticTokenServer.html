@@ -5,13 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Validación de reCAPTCHA</title>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        /* Estilo del bombillo apagado */
+        #bombillo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-top: 20px;
+            border: 1px solid #555;
+            position: relative;
+        }
+        /* Estilo del bombillo encendido */
+        .encendido {
+            background-color: yellow; /* Color encendido */
+            box-shadow: 0 0 20px yellow; /* Efecto de brillo*/
+            /* animation: mover 2s infinite alternate; Aplicar la animación */
+            animation: mover 2s forwards;
+        }
+
+        #carrito{
+            width: 50px;
+            height: 50px;
+            position: relative;
+        }
+
+        .rotar{
+            animation: rotarLuegoMover 2s forwards;
+        }
+
+        /* Definir la animación para mover el bombillo */
+        @keyframes mover {
+            0% { transform: translateX(0); }       /* Punto de inicio (posición original) */
+            100% { transform: translateX(300px); } /* Punto final (100px a la derecha) */
+        }
+
+        @keyframes rotarLuegoMover {
+            
+            0% {
+                transform: rotate(-45deg) translateX(0); /* Rotación completa sin desplazamiento */
+            }
+            100% {
+                transform: rotate(0deg) translateX(300px); /* Mantiene rotación y avanza 300px */
+            }
+        }
+
+    </style>
 </head>
 <body>
     <h1>Formulario de Contacto</h1>
     
-    <div class="g-recaptcha" data-sitekey="" data-callback="onSubmit"></div>
-
+    <div class="g-recaptcha" data-sitekey="6LeuxVYqAAAAAKEnAv4YyrudFlmPAGh14kDQi_TP" data-callback="onSubmit"></div>
+    <div id="success-message" hidden>
+        <p>¡Validación exitosa! Gracias por completar el formulario.</p>
+    </div>
+    <div id="bombillo"></div>
+    <br>
+    <div >
+        <i class="fa-solid fa-cart-shopping" id="carrito"></i>
+    </div>
     <script>
 
         function onSubmit(token) {
@@ -37,6 +89,9 @@
             .then(data => {
                 if (data.success) {
                     alert('Validación exitosa. Token enviado al servidor.');
+                    document.getElementById("success-message").removeAttribute("hidden");
+                    document.getElementById("bombillo").classList.add("encendido");
+                    document.getElementById("carrito").classList.add("rotar");
                 } else {
                     alert('Error en la validación del reCAPTCHA.');
                 }
